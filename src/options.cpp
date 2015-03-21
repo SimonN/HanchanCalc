@@ -3,29 +3,35 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <vector>
 
 #include "options.hpp"
 
 Options::Options() {
   Exception = "";
   noValidArgFlag = true;
-  helpFlag = false;
-  showParamFlag = false;
-  filename = "goe-stats.txt";
-  from = "0001-01-01";
-  before = "9999-12-31";
-  reqHanchan = 3;
-  pad = 8;
-  decay = 1.0;
-  sortParam = 1;
+  newOptions();
 }
 
 Options::~Options() {
 }
 
+void Options::newOptions() {
+  OptionSet newSet;
+  newSet.helpFlag = false;
+  newSet.showParamFlag = false;
+  newSet.filename = "goe-stats.txt";
+  newSet.from = "0001-01-01";
+  newSet.before = "9999-12-31";
+  newSet.reqHanchan = 3;
+  newSet.pad = 8;
+  newSet.decay = 1.0;
+  newSet.sortParam = 1;
+  useSet=options.size();
+  options.push_back(newSet);
+}
+
 std::string Options::getFilename() {
-  return filename;
+  return options[useSet].filename;
 }
 
 void Options::fileSet() {
@@ -61,35 +67,56 @@ void Options::set(int numArg, char ** Arg) {
     if(Arg[i][0]=='-') {
       std::string com = Arg[i];
       bool invalidCommand = true;
+      if(com=="-new") {
+        invalidCommand = false;
+        newOptions();
+      }
+      if(com=="-choose") {
+        invalidCommand = false;
+        i++;
+        if(i<numArg && Arg[i][0]!='-') {
+          if(Arg[i][0]>='0' && Arg[i][0]<='9') {
+            noValidArgFlag = false;
+            useSet = std::stol(Arg[i])-1;
+          } else {
+            Exception += "Error in command \"-choose\":\n  ";
+            Exception += "Parameter must start with a non-negative integer.";
+            Exception += "\n";
+          }
+        } else {
+          Exception += "Error: Missing command parameter in command \"-choose\".\n";
+          i--;
+        }
+      }
       if(com=="-ignore") {
         invalidCommand = false;
         Exception = "";
         noValidArgFlag = false;
-        helpFlag = false;
-        showParamFlag = false;
-        filename = "goe-stats.txt";
-        from = "0001-01-01";
-        before = "9999-12-31";
-        reqHanchan = 3;
-        pad = 8;
-        decay = 1.0;
-        sortParam = 1;
+        options[useSet].helpFlag = false;
+        options[useSet].showParamFlag = false;
+        options[useSet].filename = "goe-stats.txt";
+        options[useSet].from = "0001-01-01";
+        options[useSet].before = "9999-12-31";
+        options[useSet].reqHanchan = 3;
+        options[useSet].pad = 8;
+        options[useSet].decay = 1.0;
+        options[useSet].sortParam = 1;
       }
       if(com=="-help") {
         invalidCommand = false;
         noValidArgFlag = false;
-        helpFlag = true;
+        options[useSet].helpFlag = true;
       }
       if(com=="-sp") {
         invalidCommand = false;
         noValidArgFlag = false;
-        showParamFlag = true;
+        options[useSet].showParamFlag = true;
       }
       if(com=="-file") {
         invalidCommand = false;
         i++;
         if(i<numArg && Arg[i][0]!='-') {
-          filename=Arg[i];
+          options[useSet].filename=Arg[i];
         } else {
           Exception += "Error: Missing command parameter in command \"-file\".\n";
           i--;
@@ -101,7 +128,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           std::string param = Options::makeDate(Arg[i]);
           if(param!="") {
-            from = param;
+            options[useSet].from = param;
             noValidArgFlag = false;
           } else {
             Exception += "Error in command \"-from\":\n  ";
@@ -119,7 +146,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           std::string param = Options::makeDate(Arg[i]);
           if(param!="") {
-            before = param;
+            options[useSet].before = param;
             noValidArgFlag = false;
           } else {
             Exception += "Error in command \"-before\":\n  ";
@@ -138,11 +165,11 @@ void Options::set(int numArg, char ** Arg) {
           std::string param = Options::makeDate(Arg[i]);
           if(param!="") {
             noValidArgFlag = false;
-            from = param;
-            before = Options::addDay(from);
-            reqHanchan = 1;
-            pad = 0;
-            decay = 1.0;
+            options[useSet].from = param;
+            options[useSet].before = Options::addDay(options[useSet].from);
+            options[useSet].reqHanchan = 1;
+            options[useSet].pad = 0;
+            options[useSet].decay = 1.0;
           } else {
             Exception += "Error in command \"-date\":\n  ";
             Exception += comException;
@@ -157,32 +184,32 @@ void Options::set(int numArg, char ** Arg) {
         invalidCommand = false;
         noValidArgFlag = false;
         std::string param = Options::makeDate("today");
-        from = param;
-        before = Options::addDay(from);
-        reqHanchan = 1;
-        pad = 0;
-        decay = 1.0;
+        options[useSet].from = param;
+        options[useSet].before = Options::addDay(options[useSet].from);
+        options[useSet].reqHanchan = 1;
+        options[useSet].pad = 0;
+        options[useSet].decay = 1.0;
       }
       if(com=="-tonight") {
         invalidCommand = false;
         noValidArgFlag = false;
         std::string param = Options::makeDate("yesterday");
-        from = param;
-        before = Options::addDay(from);
-        before = Options::addDay(before);
-        reqHanchan = 1;
-        pad = 0;
-        decay = 1.0;
+        options[useSet].from = param;
+        options[useSet].before = Options::addDay(options[useSet].from);
+        options[useSet].before = Options::addDay(options[useSet].before);
+        options[useSet].reqHanchan = 1;
+        options[useSet].pad = 0;
+        options[useSet].decay = 1.0;
       }
       if(com=="-yesterday") {
         invalidCommand = false;
         noValidArgFlag = false;
         std::string param = Options::makeDate("yesterday");
-        from = param;
-        before = Options::addDay(from);
-        reqHanchan = 1;
-        pad = 0;
-        decay = 1.0;
+        options[useSet].from = param;
+        options[useSet].before = Options::addDay(options[useSet].from);
+        options[useSet].reqHanchan = 1;
+        options[useSet].pad = 0;
+        options[useSet].decay = 1.0;
       }
       if(com=="-hcreq") {
         invalidCommand = false;
@@ -190,7 +217,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           if(Arg[i][0]>='0' && Arg[i][0]<='9') {
             noValidArgFlag = false;
-            reqHanchan = std::stol(Arg[i]);
+            options[useSet].reqHanchan = std::stol(Arg[i]);
           } else {
             Exception += "Error in command \"-hcreq\":\n  ";
             Exception += "Parameter must start with a non-negative integer.";
@@ -207,7 +234,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           if(Arg[i][0]>='0' && Arg[i][0]<='9') {
             noValidArgFlag = false;
-            pad = std::stol(Arg[i]);
+            options[useSet].pad = std::stol(Arg[i]);
           } else {
             Exception += "Error in command \"-pad\":\n  ";
             Exception += "Parameter must start with a non-negative integer.";
@@ -229,7 +256,7 @@ void Options::set(int numArg, char ** Arg) {
               str[pos]='.';
             }
             noValidArgFlag = false;
-            decay = std::stod(str);
+            options[useSet].decay = std::stod(str);
           } else {
             Exception += "Error in command \"-decay\":\n  ";
             Exception += "Parameter must start with a non-negative rational number.";
@@ -244,13 +271,21 @@ void Options::set(int numArg, char ** Arg) {
         invalidCommand = false;
         i++;
         if(i<numArg && Arg[i][0]!='-') {
-          if(Arg[i][0]>='0' && Arg[i][0]<='9') {
-            noValidArgFlag = false;
-            sortParam = std::stol(Arg[i]);
+          std::string Param=Arg[i];
+          if(Param=="points" || Param=="ELO" || Param=="rank" || Param=="1st") {
+            if(Param=="points") options[useSet].sortParam = 1;
+            if(Param=="ELO") options[useSet].sortParam = 2;
+            if(Param=="rank") options[useSet].sortParam = 3;
+            if(Param=="1st") options[useSet].sortParam = 4;
           } else {
-            Exception += "Error in command \"-sort\":\n  ";
-            Exception += "Parameter must start with a non-negative integer.";
-            Exception += "\n";
+            if(Arg[i][0]>='0' && Arg[i][0]<='9') {
+              noValidArgFlag = false;
+              options[useSet].sortParam = std::stol(Arg[i]);
+            } else {
+              Exception += "Error in command \"-sort\":\n  ";
+              Exception += "Parameter must be \"points\", \"ELO\", \"rank\" or \"1st\".";
+              Exception += "\n";
+            }
           }
         } else {
           Exception += "Error: Missing command parameter in command \"-sort\".\n";
@@ -276,22 +311,23 @@ void Options::remHelp() {
   }
 }
 void Options::help() {
-  if(helpFlag) {
-    std::cout << "Implemented commands are -ignore, -help, -sp, -file, -from, -before,\n";
+  if(options[useSet].helpFlag) {
+    std::cout << "Implemented commands are -ignore, -new, -choose,\n";
+    std::cout << "  -help, -sp, -file, -from, -before,\n";
     std::cout << "  -date, -today, -tonight, -yesterday, -hcreq, -pad, -decay, -sort.\n";
     std::cout << "Also today and yesterday are valid dates.\n";
   }
 }
 void Options::showParam() {
-  if(showParamFlag) {
+  if(options[useSet].showParamFlag) {
     std::cout.setf(std::cout.left);
-    std::cout << std::setw(8) << "file:" << filename << '\n';
-    std::cout << std::setw(8) << "from:" << from << " (only count hanchans on or after this date)\n";
-    std::cout << std::setw(8) << "before:" << before << " (only count hanchans strictly before this date)\n";
-    std::cout << std::setw(8) << "hc-req:" << reqHanchan << " (players with less hanchans aren't listed)\n";
-    std::cout << std::setw(8) << "pad:" << pad << " (if fewer HCs, pad averages with old HCs of 0 pt, pl 2.5)\n";
-    std::cout << std::setw(8) << "decay:" << decay << " (weigh the n-th newest HC with decay^n for the average)\n";
-    std::cout << std::setw(8) << "sort:" << sortParam << " (Simon = 1; ELO = 2; avg Rank = 3; avg 1st = 4)\n";
+    std::cout << std::setw(8) << "file:" << options[useSet].filename << '\n';
+    std::cout << std::setw(8) << "from:" << options[useSet].from << " (only count hanchans on or after this date)\n";
+    std::cout << std::setw(8) << "before:" << options[useSet].before << " (only count hanchans strictly before this date)\n";
+    std::cout << std::setw(8) << "hc-req:" << options[useSet].reqHanchan << " (players with less hanchans aren't listed)\n";
+    std::cout << std::setw(8) << "pad:" << options[useSet].pad << " (if fewer HCs, pad averages with old HCs of 0 pt, pl 2.5)\n";
+    std::cout << std::setw(8) << "decay:" << options[useSet].decay << " (weigh the n-th newest HC with decay^n for the average)\n";
+    std::cout << std::setw(8) << "sort:" << options[useSet].sortParam << " (avg Points = 1; ELO = 2; avg Rank = 3; avg 1st = 4)\n";
   }
 }
 void Options::throwException() {
