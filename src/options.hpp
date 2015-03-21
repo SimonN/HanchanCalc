@@ -1,15 +1,9 @@
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#ifndef OPTIONS_HPP
+#define OPTIONS_HPP
 
-#include <ctime>
-#include <iostream>
-#include <iomanip>
-#include <cstdint>
-#include <algorithm>
-#include <fstream>
+#include <string>
 
-class Options
-{
+class Options {
   public:
     Options();
     ~Options();
@@ -35,13 +29,13 @@ class Options
     std::string filename;
     std::string from;
     std::string before;
-    uint64_t reqHanchan;
-    uint64_t pad;
+    int reqHanchan;
+    int pad;
     double decay;
-    uint64_t sortParam;
+    int sortParam;
 
     std::string makeDate(std::string date);
     std::string addDay(std::string date);
 };
 
-#endif /* OPTIONS_H */
+#endif /* OPTIONS_HPP */

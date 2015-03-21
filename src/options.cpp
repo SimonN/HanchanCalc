@@ -1,3 +1,8 @@
+#include <algorithm>
+#include <ctime>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <vector>
 
 #include "options.hpp"
@@ -31,7 +36,7 @@ void Options::fileSet() {
     line += " ";
     if(line[0]!='/') {
       std::vector <std::string> arg;
-      int64_t space;
+      int space;
       space = line.find(' ');
       while(space!=-1) {
         if(space!=0) {
@@ -41,7 +46,7 @@ void Options::fileSet() {
         space = line.find(' ');
       }
       char * v[arg.size()+1];
-      for(uint64_t i=0; i<arg.size(); i++) {
+      for(size_t i=0; i<arg.size(); i++) {
         v[i+1]=&(arg[i])[0];
       }
       Options::set(arg.size()+1, v);
@@ -52,7 +57,7 @@ void Options::fileSet() {
 }
 
 void Options::set(int numArg, char ** Arg) {
-  for(int64_t i=1; i<numArg; i++) {
+  for(int i=1; i<numArg; i++) {
     if(Arg[i][0]=='-') {
       std::string com = Arg[i];
       bool invalidCommand = true;
@@ -219,7 +224,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           if(Arg[i][0]>='0' && Arg[i][0]<='9') {
             std::string str(Arg[i]);
-            int64_t pos = str.find(',');
+            int pos = str.find(',');
             if(pos!=-1) {
               str[pos]='.';
             }
@@ -319,7 +324,7 @@ std::string Options::makeDate(std::string dateraw) {
     return str;
   }
   std::string year, month, day, date;
-  int64_t t;
+  int t;
   t = dateraw.find('-');
   if(t==-1) {
     t=dateraw.length();
@@ -331,7 +336,7 @@ std::string Options::makeDate(std::string dateraw) {
   }
   year = dateraw.substr(0,t);
   while(year.length()<4) year = "0"+year;
-  for(uint64_t i=0; i<4; i++) {
+  for(int i=0; i<4; i++) {
     if(year[i]<'0' || year[i]>'9') {
       comException = "\"Year\" should only have digits.";
       return "";
@@ -349,7 +354,7 @@ std::string Options::makeDate(std::string dateraw) {
   }
   month = dateraw.substr(0,t);
   while(month.length()<2) month = "0"+month;
-  for(uint64_t i=0; i<2; i++) {
+  for(int i=0; i<2; i++) {
     if(month[i]<'0' || month[i]>'9') {
       comException = "\"Month\" should only have digits.";
       return "";
@@ -371,7 +376,7 @@ std::string Options::makeDate(std::string dateraw) {
   }
   day = dateraw.substr(0,t);
   while(day.length()<2) day = "0"+day;
-  for(uint64_t i=0; i<2; i++) {
+  for(int i=0; i<2; i++) {
     if(day[i]<'0' || day[i]>'9') {
       comException = "\"Day\" should only have digits.";
       return "";

@@ -1,5 +1,5 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PLAYER_HPP
+#define PLAYER_HPP
 
 class Player
 {
@@ -11,4 +11,4 @@ class Player
 
 };
 
-#endif /* PLAYER_H */
+#endif /* PLAYER_HPP */

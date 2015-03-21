@@ -6,7 +6,7 @@
 
 
 
-int main(int numArg, char ** Arg) {
+int main(int numArg, char * Arg[]) {
   Options options;
 
   options.fileSet();

@@ -1,5 +1,5 @@
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef FILTER_HPP
+#define FILTER_HPP
 
 #include <vector>
 
@@ -18,4 +18,4 @@ class Filter
     std::vector <Player> players;
 };
 
-#endif /* FILTER_ */
+#endif /* FILTER_HPP */

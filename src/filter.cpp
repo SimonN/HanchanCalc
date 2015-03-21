@@ -1,5 +1,8 @@
 #include "filter.hpp"
 
+#include <fstream>
+#include <iostream>
+
 Filter::Filter(Options options) {
   std::ifstream input;
   input.open(options.getFilename());
