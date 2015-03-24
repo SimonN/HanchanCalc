@@ -24,6 +24,8 @@ class Options {
     void newOptions();
 
     std::string getFilename();
+    std::string getFrom();
+    std::string getBefore();
 
     void fileSet();
     void set(int numArg, char ** Arg);

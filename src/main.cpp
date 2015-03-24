@@ -18,6 +18,7 @@ int main(int numArg, char * Arg[]) {
   filter.output_table();
 
   options.throwException();
+  filter.throwException();
   options.help();
   options.remHelp();
   return 0;

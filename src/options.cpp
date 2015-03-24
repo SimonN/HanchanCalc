@@ -30,9 +30,9 @@ void Options::newOptions() {
   options.push_back(newSet);
 }
 
-std::string Options::getFilename() {
-  return options[useSet].filename;
-}
+std::string Options::getFilename() {return options[useSet].filename;}
+std::string Options::getFrom() {return options[useSet].from;}
+std::string Options::getBefore() {return options[useSet].before;}
 
 void Options::fileSet() {
   std::ifstream config;
@@ -77,7 +77,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           if(Arg[i][0]>='0' && Arg[i][0]<='9') {
             noValidArgFlag = false;
-            useSet = std::stol(Arg[i])-1;
+            useSet = std::stoi(Arg[i])-1;
           } else {
             Exception += "Error in command \"-choose\":\n  ";
             Exception += "Parameter must start with a non-negative integer.";
@@ -217,7 +217,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           if(Arg[i][0]>='0' && Arg[i][0]<='9') {
             noValidArgFlag = false;
-            options[useSet].reqHanchan = std::stol(Arg[i]);
+            options[useSet].reqHanchan = std::stoi(Arg[i]);
           } else {
             Exception += "Error in command \"-hcreq\":\n  ";
             Exception += "Parameter must start with a non-negative integer.";
@@ -234,7 +234,7 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           if(Arg[i][0]>='0' && Arg[i][0]<='9') {
             noValidArgFlag = false;
-            options[useSet].pad = std::stol(Arg[i]);
+            options[useSet].pad = std::stoi(Arg[i]);
           } else {
             Exception += "Error in command \"-pad\":\n  ";
             Exception += "Parameter must start with a non-negative integer.";
@@ -272,15 +272,16 @@ void Options::set(int numArg, char ** Arg) {
         i++;
         if(i<numArg && Arg[i][0]!='-') {
           std::string Param=Arg[i];
-          if(Param=="points" || Param=="ELO" || Param=="rank" || Param=="1st") {
+          if(Param=="points" || Param=="ELO" || Param=="rank" || Param=="1st" || Param=="R") {
             if(Param=="points") options[useSet].sortParam = 1;
             if(Param=="ELO") options[useSet].sortParam = 2;
             if(Param=="rank") options[useSet].sortParam = 3;
             if(Param=="1st") options[useSet].sortParam = 4;
+            if(Param=="R") options[useSet].sortParam = 5;
           } else {
             if(Arg[i][0]>='0' && Arg[i][0]<='9') {
               noValidArgFlag = false;
-              options[useSet].sortParam = std::stol(Arg[i]);
+              options[useSet].sortParam = std::stoi(Arg[i]);
             } else {
               Exception += "Error in command \"-sort\":\n  ";
               Exception += "Parameter must be \"points\", \"ELO\", \"rank\" or \"1st\".";
@@ -327,7 +328,7 @@ void Options::showParam() {
     std::cout << std::setw(8) << "hc-req:" << options[useSet].reqHanchan << " (players with less hanchans aren't listed)\n";
     std::cout << std::setw(8) << "pad:" << options[useSet].pad << " (if fewer HCs, pad averages with old HCs of 0 pt, pl 2.5)\n";
     std::cout << std::setw(8) << "decay:" << options[useSet].decay << " (weigh the n-th newest HC with decay^n for the average)\n";
-    std::cout << std::setw(8) << "sort:" << options[useSet].sortParam << " (avg Points = 1; ELO = 2; avg Rank = 3; avg 1st = 4)\n";
+    std::cout << std::setw(8) << "sort:" << options[useSet].sortParam << " (avg Points = 1; ELO = 2; avg Rank = 3; avg 1st = 4; R = 5)\n";
   }
 }
 void Options::throwException() {
