@@ -30,9 +30,14 @@ void Options::newOptions() {
   options.push_back(newSet);
 }
 
+std::string Options::getBefore() {return options[useSet].before;}
+double Options::getDecay() {return options[useSet].decay;}
 std::string Options::getFilename() {return options[useSet].filename;}
 std::string Options::getFrom() {return options[useSet].from;}
-std::string Options::getBefore() {return options[useSet].before;}
+int Options::getPad() {return options[useSet].pad;}
+int Options::getReqHanchan() {return options[useSet].reqHanchan;}
+int Options::getSortParam() {return options[useSet].sortParam;}
+
 
 void Options::fileSet() {
   std::ifstream config;
@@ -272,12 +277,11 @@ void Options::set(int numArg, char ** Arg) {
         i++;
         if(i<numArg && Arg[i][0]!='-') {
           std::string Param=Arg[i];
-          if(Param=="points" || Param=="ELO" || Param=="rank" || Param=="1st" || Param=="R") {
+          if(Param=="points" || Param=="R" || Param=="rank" || Param=="1st") {
             if(Param=="points") options[useSet].sortParam = 1;
-            if(Param=="ELO") options[useSet].sortParam = 2;
+            if(Param=="R") options[useSet].sortParam = 2;
             if(Param=="rank") options[useSet].sortParam = 3;
             if(Param=="1st") options[useSet].sortParam = 4;
-            if(Param=="R") options[useSet].sortParam = 5;
           } else {
             if(Arg[i][0]>='0' && Arg[i][0]<='9') {
               noValidArgFlag = false;
@@ -328,7 +332,7 @@ void Options::showParam() {
     std::cout << std::setw(8) << "hc-req:" << options[useSet].reqHanchan << " (players with less hanchans aren't listed)\n";
     std::cout << std::setw(8) << "pad:" << options[useSet].pad << " (if fewer HCs, pad averages with old HCs of 0 pt, pl 2.5)\n";
     std::cout << std::setw(8) << "decay:" << options[useSet].decay << " (weigh the n-th newest HC with decay^n for the average)\n";
-    std::cout << std::setw(8) << "sort:" << options[useSet].sortParam << " (avg Points = 1; ELO = 2; avg Rank = 3; avg 1st = 4; R = 5)\n";
+    std::cout << std::setw(8) << "sort:" << options[useSet].sortParam << " (avg Points = 1; ELO = 2; avg Rank = 3; avg 1st = 4; name = 5)\n";
   }
 }
 void Options::throwException() {

@@ -23,9 +23,13 @@ class Options {
     
     void newOptions();
 
+    std::string getBefore();
+    double getDecay();
     std::string getFilename();
     std::string getFrom();
-    std::string getBefore();
+    int getPad();
+    int getReqHanchan();
+    int getSortParam();
 
     void fileSet();
     void set(int numArg, char ** Arg);

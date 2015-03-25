@@ -15,7 +15,7 @@ int main(int numArg, char * Arg[]) {
   options.showParam();
 
   Filter filter(options);
-  filter.output_table();
+  filter.output_table(options);
 
   options.throwException();
   filter.throwException();
