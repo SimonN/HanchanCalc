@@ -22,7 +22,7 @@ Filter::Filter(Options options) {
     
     if(getHanchan(currentPlayer, line)==false) continue;
     
-    std::sort(std::begin(currentPlayer), std::end(currentPlayer));
+    std::sort(&currentPlayer[0], &currentPlayer[4]);
     
     rcalcHanchan(currentPlayer);
     calcHanchan(options, currentPlayer);
@@ -40,7 +40,7 @@ Filter::~Filter() {
 void Filter::output_table(Options options) {
   int sortParam = options.getSortParam();
   int reqHanchan = options.getReqHanchan();;
-  std::sort(std::begin(players), std::end(players), PlayerSort(sortParam));
+  std::sort(&players[0], &players[players.size()], PlayerSort(sortParam));
   std::cout << std::left << std::setw(nameLength) << "Name" << " | " ;
   std::cout << std::right << std::setw(4) << "RVal" << " | " ;
   std::cout << std::right << std::setw(6) << "avPts" << " | " ;
@@ -174,7 +174,7 @@ void Filter::calcHanchan(Options options, hanchanPlayer player[]) {
 
 void Filter::rcalcHanchan(hanchanPlayer player[]) {
   double old[4]; 
-  double s;
+  double s=0;
   double k = 20;
   for(int i=0; i<4; i++) {
     old[i] = players[player[i].number].R;
