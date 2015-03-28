@@ -11,22 +11,22 @@ Filter::Filter(Options options) {
   std::ifstream input;
   std::string line;
   hanchanPlayer currentPlayer[4];
-  
+
   nameLength = 0;
-  
+
   input.open(options.getFilename());
   while(std::getline(input, line)) {
     line += ' ';
-    
+
     if(checkDate(options, line)==false) continue;
-    
+
     if(getHanchan(currentPlayer, line)==false) continue;
-    
+
     std::sort(&currentPlayer[0], &currentPlayer[4]);
-    
+
     rcalcHanchan(currentPlayer);
     calcHanchan(options, currentPlayer);
-    
+
 
   }
   input.close();
@@ -38,7 +38,7 @@ Filter::~Filter() {
 }
 
 void Filter::output_table(Options options) {
-  int sortParam = options.getSortParam();
+  PlayerSortBy sortParam = options.getSortParam();
   int reqHanchan = options.getReqHanchan();;
   std::sort(&players[0], &players[players.size()], PlayerSort(sortParam));
   std::cout << std::left << std::setw(nameLength) << "Name" << " | " ;
@@ -84,24 +84,24 @@ void Filter::throwException() {
 bool Filter::checkDate(Options options, std::string line) {
   std::string date;
   bool error = false;
-  
+
   if(line[10]!=' ') error = true;
   if(line[4]!='-' || line[7]!='-') error = true;
   if(line[0]<'0' || line[1]<'0' || line[2]<'0' || line[3]<'0') error = true;
   if(line[5]<'0' || line[6]<'0' || line[8]<'0' || line[9]<'0') error = true;
   if(line[5]>'9' || line[6]>'9' || line[8]>'9' || line[9]>'9') error = true;
-  
+
   if(error) {
     Exception += "Error in line:\n ";
     Exception += line;
     Exception += "\n Date could not be read.\n";
     return false;
   }
-  
+
   date = line.substr(0,10);
   if(date<options.getFrom()) return false;
   if(date>=options.getBefore()) return false;
-  
+
   return true;
 }
 
@@ -139,7 +139,7 @@ bool Filter::getHanchan(hanchanPlayer player[], std::string line) {
     }
     data = data.substr(space+1);
   }
-  
+
   //check sum of points
   if(player[0].points+player[1].points+player[2].points+player[3].points!=0) {
     Exception += "Error in line:\n ";
@@ -158,27 +158,34 @@ void Filter::addPlayer(std::string name) {
 }
 
 
-void Filter::calcHanchan(Options options, hanchanPlayer player[]) {
-  double decay = options.getDecay();
-  for(int i=0; i<4; i++) {
-    players[player[i].number].totalHanchans++;
-    players[player[i].number].decayedTotal = (players[player[i].number].decayedTotal*decay)+1;
-    players[player[i].number].decayedPoints = (players[player[i].number].decayedPoints*decay)+player[i].points;
-    players[player[i].number].decayedPlaceSum = (players[player[i].number].decayedPlaceSum*decay)+(4-i);
+void Filter::calcHanchan(Options options, hanchanPlayer player[])
+{
+  const double decay = options.getDecay();
+
+  for (int i = 0; i < 4; i++) {
+    Player& p = players[player[i].number];
+    p.totalHanchans++;
+    p.decayedTotal    = (p.decayedTotal    * decay) + 1;
+    p.decayedPoints   = (p.decayedPoints   * decay) + player[i].points;
+    p.decayedPlaceSum = (p.decayedPlaceSum * decay) + (4-i);
   }
-  players[player[3].number].decayedToppu = (players[player[3].number].decayedToppu*decay)+1;
-  players[player[3].number].decayedRentai = (players[player[3].number].decayedRentai*decay)+1;
-  players[player[2].number].decayedRentai = (players[player[2].number].decayedRentai*decay)+1;
-  players[player[0].number].decayedRasu = (players[player[0].number].decayedRasu*decay)+1;
+  Player& winner = players[player[3].number];
+  Player& second = players[player[2].number];
+  Player& fourth = players[player[0].number];
+
+  winner.decayedToppu  = (winner.decayedToppu  * decay) + 1;
+  winner.decayedRentai = (winner.decayedRentai * decay) + 1;
+  second.decayedRentai = (second.decayedRentai * decay) + 1;
+  fourth.decayedRasu   = (fourth.decayedRasu   * decay) + 1;
 }
 
 void Filter::rcalcHanchan(hanchanPlayer player[]) {
-  double old[4]; 
+  double old[4];
   double s=0;
   double k = 20;
   for(int i=0; i<4; i++) {
     old[i] = players[player[i].number].R;
-    
+
   }
   for(int i=0; i<4; i++) {
     for(int j=0; j<4; j++) {

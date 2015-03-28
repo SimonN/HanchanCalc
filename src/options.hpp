@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "player.hpp" // PlayerSortParam
+
 struct OptionSet {
   bool helpFlag; //show help if available
   bool showParamFlag; //show parameters before output
@@ -13,14 +15,14 @@ struct OptionSet {
   int reqHanchan;
   int pad;
   double decay;
-  int sortParam;
+  PlayerSortBy sortParam;
 };
 
 class Options {
   public:
     Options();
     ~Options();
-    
+
     void newOptions();
 
     std::string getBefore();
@@ -29,7 +31,7 @@ class Options {
     std::string getFrom();
     int getPad();
     int getReqHanchan();
-    int getSortParam();
+    PlayerSortBy getSortParam();
 
     void fileSet();
     void set(int numArg, char ** Arg);

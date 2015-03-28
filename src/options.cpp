@@ -25,7 +25,7 @@ void Options::newOptions() {
   newSet.reqHanchan = 3;
   newSet.pad = 8;
   newSet.decay = 1.0;
-  newSet.sortParam = 1;
+  newSet.sortParam = SORT_BY_POINTS;
   useSet=options.size();
   options.push_back(newSet);
 }
@@ -36,7 +36,7 @@ std::string Options::getFilename() {return options[useSet].filename;}
 std::string Options::getFrom() {return options[useSet].from;}
 int Options::getPad() {return options[useSet].pad;}
 int Options::getReqHanchan() {return options[useSet].reqHanchan;}
-int Options::getSortParam() {return options[useSet].sortParam;}
+PlayerSortBy Options::getSortParam() {return options[useSet].sortParam;}
 
 
 void Options::fileSet() {
@@ -105,7 +105,7 @@ void Options::set(int numArg, char ** Arg) {
         options[useSet].reqHanchan = 3;
         options[useSet].pad = 8;
         options[useSet].decay = 1.0;
-        options[useSet].sortParam = 1;
+        options[useSet].sortParam = SORT_BY_POINTS;
       }
       if(com=="-help") {
         invalidCommand = false;
@@ -278,19 +278,14 @@ void Options::set(int numArg, char ** Arg) {
         if(i<numArg && Arg[i][0]!='-') {
           std::string Param=Arg[i];
           if(Param=="points" || Param=="R" || Param=="rank" || Param=="1st") {
-            if(Param=="points") options[useSet].sortParam = 1;
-            if(Param=="R") options[useSet].sortParam = 2;
-            if(Param=="rank") options[useSet].sortParam = 3;
-            if(Param=="1st") options[useSet].sortParam = 4;
+            if (Param == "points") options[useSet].sortParam = SORT_BY_POINTS;
+            if (Param == "R")      options[useSet].sortParam = SORT_BY_R;
+            if (Param == "rank")   options[useSet].sortParam = SORT_BY_PLACE;
+            if (Param == "1st")    options[useSet].sortParam = SORT_BY_TOPPU;
           } else {
-            if(Arg[i][0]>='0' && Arg[i][0]<='9') {
-              noValidArgFlag = false;
-              options[useSet].sortParam = std::stoi(Arg[i]);
-            } else {
-              Exception += "Error in command \"-sort\":\n  ";
-              Exception += "Parameter must be \"points\", \"ELO\", \"rank\" or \"1st\".";
-              Exception += "\n";
-            }
+            Exception += "Error in command \"-sort\":\n  ";
+            Exception += "Parameter must be \"points\", \"ELO\", \"rank\" or \"1st\".";
+            Exception += "\n";
           }
         } else {
           Exception += "Error: Missing command parameter in command \"-sort\".\n";
